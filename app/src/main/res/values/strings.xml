@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">DeviceList</string>
+    <string name="bntPaired"> ˅ </string>
+    <string name="BTclkd"></string>
+    <string name="btnDisconnect">Disconnect</string>
+    <string name="btnScan"> Lancer un Scan </string>
+    <string name="btnBack">Run Background</string>
+    <string name="btnID">Read ID</string>
+    <string name="textview_periph">Périphériques appairés : </string>
+    <string name="fleche_liste"></string>
+
+
+</resources>
