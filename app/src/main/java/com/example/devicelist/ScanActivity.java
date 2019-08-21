@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.opencsv.CSVWriter;
 import java.io.DataInputStream;
@@ -59,7 +60,6 @@ public class ScanActivity extends AppCompatActivity {
     public  boolean recv = true;
     String dataString = null;
     String[] parts ;
-
     private LineChartView lineChartView ;
 
 
@@ -198,6 +198,9 @@ public class ScanActivity extends AppCompatActivity {
 
                         // Creation d un repertoire dans stockage interne et écriture du fichier .csv
                         File csv = new File(android.os.Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "GreenTropism/NeoSpectraMicro");
+                        if (!csv.exists()){
+                            csv.mkdirs();}
+
                         String csvPath = csv.getAbsolutePath()+"/" + fileName ;
                         CSVWriter writer = new CSVWriter(new FileWriter(csvPath));
                         writer.writeNext(wavLengthStr);
@@ -349,6 +352,6 @@ public class ScanActivity extends AppCompatActivity {
     // fast way to call Toast
     private void msg(String s)
     {
-        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
     }
 }

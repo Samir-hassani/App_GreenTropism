@@ -2,7 +2,9 @@ package com.example.devicelist;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.io.File;
 import java.io.FileWriter;
+import java.net.URLConnection;
 
 
 public class Liste_spectres extends AppCompatActivity {
@@ -27,8 +30,6 @@ public class Liste_spectres extends AppCompatActivity {
     ListView listViewFiles;
     public static String EXTRA_ADDRESS = "name_file";
     String path;                // = "/data/data/com.example.devicelist/files/";
-
-
 
 
     @Override
@@ -106,6 +107,14 @@ public class Liste_spectres extends AppCompatActivity {
         }else if(item.getItemId() == R.id.informations){
             Toast.makeText(getApplicationContext(),"Nom du fichier sélectionné :\n"+key ,Toast.LENGTH_LONG).show();
             return true;
+        }else if(item.getItemId() == R.id.share){
+            File fileToSend = new File(path+key);
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType("text/plain");
+            sharingIntent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(Liste_spectres.this,BuildConfig.APPLICATION_ID + ".provider",fileToSend));
+            sharingIntent.putExtra(Intent.EXTRA_SUBJECT, key);
+            startActivity(Intent.createChooser(sharingIntent, "Partager par :"));
+         return true;
         }
         else {
             return super.onContextItemSelected(item);

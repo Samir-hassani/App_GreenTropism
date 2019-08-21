@@ -55,11 +55,6 @@ public class MainActivity extends AppCompatActivity {
         image_button = (ImageButton) findViewById(R.id.image_button);
         fleche_liste = (ImageButton) findViewById(R.id.fleche_liste);
 
-
-        if(devices.isEmpty()){
-            Toast.makeText(getApplicationContext(), "No paired Device !", Toast.LENGTH_LONG).show();};
-
-
             // changer l image bluetooth selon son état
         if(myBluetooth.isEnabled()){
             image_button.setImageResource(R.drawable.bt_active);
