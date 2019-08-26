@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -77,7 +78,6 @@ public class ScanActivity extends AppCompatActivity {
 
         Intent newint = getIntent();
         adressBT = newint.getStringExtra(MainActivity.EXTRA_ADDRESS);
-
 
         /*******  Call CLASS to connect ******/
         new ConnectBT().execute();
@@ -324,7 +324,7 @@ public class ScanActivity extends AppCompatActivity {
             }
             else
             {
-                msg("Connected");
+                msg("Connecté");
                 isBtConnected = true;
             }
             progress.dismiss();
@@ -340,6 +340,10 @@ public class ScanActivity extends AppCompatActivity {
             try
             {
                 btSocket.close();
+                if (!btSocket.isConnected()){
+                    msg("Déconnecté");
+                }
+
             }
             catch (IOException e)
             { msg("Error");}
@@ -348,10 +352,25 @@ public class ScanActivity extends AppCompatActivity {
         finish(); //return to the first layout
 
     }
+            // bouton back de l'appareil
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK ) {
+            try {
+                btSocket.close();
+                if (!btSocket.isConnected()){
+                    msg("Déconnecté");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     // fast way to call Toast
     private void msg(String s)
     {
-        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
     }
 }
