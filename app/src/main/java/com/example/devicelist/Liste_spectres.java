@@ -29,7 +29,7 @@ public class Liste_spectres extends AppCompatActivity {
     public Context context;
     ListView listViewFiles;
     public static String EXTRA_ADDRESS = "name_file";
-    String path;                // = "/data/data/com.example.devicelist/files/";
+    String path;
 
 
     @Override
@@ -47,7 +47,7 @@ public class Liste_spectres extends AppCompatActivity {
         File csv = new File(android.os.Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "GreenTropism/NeoSpectraMicro");
         path = csv.getAbsolutePath()+ "/";
 
-            // Get files name of directory
+            // Avoir les nooms de tout les fichiers du répertoire
         File directory = new File(path);
         File[] files = directory.listFiles();
         String[] namefiles = new String[files.length];

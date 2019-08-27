@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.design.widget.TabLayout;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,142 +39,66 @@ import lecho.lib.hellocharts.view.LineChartView;
 
 public class FileContent extends AppCompatActivity {
 
-    Button showData;
-    String file_name ;
-    TextView file_content;
-    String[] wavelengthStr;
-    String[] absorbanceStr;
-    LineChartView lineChartViewFileCsv ;
+    private static final String TAG = "FileContentActivity";
+    public static String file_name ;
     public static String path;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
+    ViewPagerAdapter mViewPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
                 setContentView(R.layout.activity_file_content);
 
+        mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        showData = (Button)findViewById(R.id.showData);
-        file_content = (TextView)findViewById(R.id.textViewContent);
-        file_content.setVisibility(View.INVISIBLE);
-        lineChartViewFileCsv = (LineChartView)findViewById(R.id.chart);
-        lineChartViewFileCsv.setVisibility(View.INVISIBLE);
+        viewPager = (ViewPager)findViewById(R.id.pager);
+        setupViewPager(viewPager);
+
+        tabLayout = (TabLayout)findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+
+        setupTabIcones();
 
                 // to make text view Scrollable we have to caste textview in a ScrollView in .xml
-                // Recuperer le nom du fichier selectionné
+                // Récupérer le nom du fichier selectionné
         Intent new_int = getIntent();
         file_name = new_int.getStringExtra(Liste_spectres.EXTRA_ADDRESS);
 
-        // file path
+                 // file path
         File csv = new File(android.os.Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "GreenTropism/NeoSpectraMicro");
         path = csv.getAbsolutePath()+ "/";
 
                 // set title of the activity
         setTitle(file_name);
-
-                // Read content of file selected and make it in a textView
-       // FileInputStream is;
-       // BufferedReader reader;
-        final File file = new File(path + file_name);
-
-        if (file.exists()) {
-            try {
-                FileInputStream is = new FileInputStream(file);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-                String line1 = reader.readLine();
-                wavelengthStr = line1.split(",");
-                file_content.append("WaveLength : ");
-                file_content.append("\n"+line1);
-
-                String line2 = reader.readLine();
-                absorbanceStr = line2.split(",");
-                file_content.append("\nAbsorbance : ");
-                file_content.append("\n"+line2);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }else{
-            Toast.makeText(getApplicationContext(),"File nto found ",Toast.LENGTH_SHORT).show();
-        }
-
-        float[] wavelength = new float[4096];
-        float[] absorbance = new float[4096];
-        for(int i=0; i<absorbance.length; i++) {
-            wavelengthStr[i] = wavelengthStr[i].substring(1,wavelengthStr[i].length()-1);
-            absorbanceStr[i] = absorbanceStr[i].substring(1,absorbanceStr[i].length()-1);
-            wavelength[i] = Float.valueOf(wavelengthStr[i]);     // Conversion des valeurs de waveLength de (str) en ==> "Float"
-            absorbance[i] = Float.valueOf(absorbanceStr[i]);    // Conversion des valeurs de absorbance de (str) en ==> "Float"
-        }
-
-                // Plot
-        String[] xAxisData = wavelengthStr;
-        float[] yAxisData = absorbance;
-
-        List yAxisValues = new ArrayList();
-        List xAxisValues = new ArrayList();
-
-        Line line = new Line(yAxisValues).setColor(Color.parseColor("#050586"));
-
-        for (int i = 0; i < xAxisData.length; i++) {
-            xAxisValues.add(i, new AxisValue(i).setLabel(xAxisData[i]));
-            yAxisValues.add(new PointValue(i, yAxisData[i]));
-        }
-
-        lineChartViewFileCsv.setVisibility(View.VISIBLE);
-        List lines = new ArrayList();
-        lines.add(line);
-        LineChartData data = new LineChartData();
-        data.setLines(lines);
-        line.setHasPoints(false);   // marquer chaque point par un cercle
-        line.setStrokeWidth(1);     // Epaisseur du la ligne du graphe
-
-        Axis xAxis = new Axis();
-        xAxis.setValues(xAxisValues);
-        xAxis.setName("WaveLength");
-        xAxis.setTextSize(10);
-        xAxis.setTextColor(Color.parseColor("#5A5858"));
-        data.setAxisXBottom(xAxis);
-        xAxis.setHasTiltedLabels(true);     //Auto generate values
-
-        Axis yAxis = new Axis();
-        yAxis.setName("Absorbance");
-        yAxis.setTextSize(10);
-        yAxis.setTextColor(Color.parseColor("#5A5858"));
-        data.setAxisYLeft(yAxis);
-        yAxis.setHasTiltedLabels(true);     //Auto generate values
-
-        lineChartViewFileCsv.setLineChartData(data);
-
-
-                // bouton pour naviguer entre plot et data
-        showData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(lineChartViewFileCsv.isShown()) {
-                    lineChartViewFileCsv.setVisibility(View.INVISIBLE);
-                    file_content.setVisibility(View.VISIBLE);
-                    showData.setText("Show Plot");
-                }else{
-                    lineChartViewFileCsv.setVisibility(View.VISIBLE);
-                    file_content.setVisibility(View.INVISIBLE);
-                    showData.setText("Show Data");
-                }
-
-            }
-        });
     }
-            //Retour pour la fleche back sur l action bare
+            // Titre de chaque fragment
+    private void setupViewPager (ViewPager viewPager){
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new GrapheFragment(),"GRAPHE");
+        adapter.addFragment(new CsvFragment(),"FICHIER .CSV");
+        viewPager.setAdapter(adapter);
+    }
+
+            // Icone pour chaque fragment
+    private void setupTabIcones(){
+        tabLayout.getTabAt(0).setIcon(R.drawable.plot);
+        tabLayout.getTabAt(1).setIcon(R.drawable.csv_file);
+
+    }
+
+            //Retour pour la flèche back sur l action bare  et partage fichier
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case(android.R.id.home):
                 finish();
             break;
-            case(R.id.share_button):
-                File fileToSend = new File(path+file_name);
+            case(R.id.share_button):        // Boutton Partager
+                File fileToSend = new File(path+file_name);         // Chemin absolu du fichier
                 Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-                sharingIntent.setType("text/plain");
+                sharingIntent.setType("text/plain");                           // Type fichier .csv
                 sharingIntent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(FileContent.this,BuildConfig.APPLICATION_ID + ".provider",fileToSend));
                 sharingIntent.putExtra(Intent.EXTRA_SUBJECT, file_name);
                 startActivity(Intent.createChooser(sharingIntent, "Partager par :"));

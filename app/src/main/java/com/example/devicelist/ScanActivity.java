@@ -51,7 +51,7 @@ public class ScanActivity extends AppCompatActivity {
     BluetoothAdapter myBluetooth = null;
     BluetoothSocket btSocket;
     private boolean isBtConnected = false;
-    private boolean isRunBack = true;
+    private boolean isRunBack = false;
     //SPP UUID. Look for it
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     public byte[] buffer = new byte[1024];
@@ -94,12 +94,13 @@ public class ScanActivity extends AppCompatActivity {
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                    // condition if pour runBackground avant de faire un scan
                 if(isRunBack) {
                     try {
 
                         btSocket.getOutputStream().write("5".toString().getBytes());
 
-                        // Reception des donnees envoyees par le Kit NeoSpectra
+                        // Récéption des données envoyées par le Kit NeoSpectra
 
                         tmpIn = btSocket.getInputStream();
                         DataInputStream mmInStream = new DataInputStream(tmpIn);
